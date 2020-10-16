@@ -25,28 +25,24 @@ cartToPolar v = (norm v, angle v)
     norm (x,y) = sqrt $ x*x + y*y
     angle (x,y) = 180.0 / pi * (atan2 y x)
 
-
--- #TODO this doesn't need to be split into 2 functions, i
---    and it might be easier without having to map all the time
 kochLine :: Int -> Point -> Point -> Picture
-kochLine n p1 p2 = translate (fst p1) (snd p1) $ rotate (-angle) $ scale size size $ Pictures $ kochLine' n
+kochLine n p1 p2 = translate (fst p1) (snd p1) $ rotate (-angle) $ scale size size $ kochLine' n
   where
     (size,angle) = cartToPolar $ differenceVector p1 p2
 
-kochLine' :: Int -> [Picture]
-kochLine' 0 = [Blank]
-kochLine' 1 = [Line [(0,0), (1,0)]]
-kochLine' n = part1 ++ part2 ++ part3 ++ part4
+kochLine' :: Int -> Picture
+kochLine' 0 = Blank
+kochLine' 1 = Line [(0,0), (1,0)]
+kochLine' n = Pictures [part1, part2, part3, part4]
   where
-    subLine = map (scale (1.0/3) (1.0/3)) $ kochLine' (n-1)
+    subLine = scale (1.0/3) (1.0/3) $ kochLine' (n-1)
     xshift = translate (1.0/3) 0
     xshift2 = translate (2.0/3) 0
     part1 = subLine
 
-    part2 = map xshift $ map (rotate (-60)) subLine
-    part3 = map ( xshift . rotate (-60)  . xshift . rotate 120) $ subLine
-    part4 = map xshift2 subLine
-
+    part2 =  xshift $ rotate (-60) subLine
+    part3 = xshift $ rotate (-60)  $ xshift $ rotate 120 $ subLine
+    part4 = xshift2 subLine
 
 
 kochSnowflake :: Int -> Point -> Float -> Picture
