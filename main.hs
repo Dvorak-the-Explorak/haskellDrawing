@@ -57,10 +57,32 @@ kochSnowflake n (x,y) s = Pictures [base, left, right]
     right = kochLine n (x, y + s*(sqrt 3)/2) (x+s/2.0,y)
 
 
+triangle (x,y) s = Line [p1, p2, p3, p1]
+  where
+    p1 = (x-s/2,y)
+    p2 = (x+s/2,y)
+    p3 = (x, y + s*(sqrt 3)/2)
+
+sierpinski :: Int -> Point -> Float -> Picture
+sierpinski 0 _ _ = Blank
+sierpinski 1 p s = triangle p s
+sierpinski n (x,y) s = Pictures [left, right, top]
+  where
+    left = sierpinski (n-1) (x-s/4,y) (s/2)
+    right = sierpinski (n-1) (x+s/4,y) (s/2)
+    top = sierpinski (n-1) (x,y + s*(sqrt 3)/4) (s/2)
+
+
 
 -- main :: IO ()
 -- main = display window background drawing
 
 main :: IO ()
+main = display window background $ Pictures [kochSnowflake n p s, sierpinski n p s]
+  where 
+    n = 8
+    p = (0,-200)
+    s = 600
 -- main = display window background $ kochLine 7 (0,0) (200,200)
-main = display window background $ kochSnowflake 7 (0,0) 200
+-- main = display window background $ kochSnowflake 7 (0,0) 200
+-- main = display window background $ sierpinski 6 (0,0) 200
